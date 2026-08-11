@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAX BY MR ASAD - Advanced Portal</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow-x: hidden; background-color: #030712; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+        .glass-panel { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- 3D Background Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Header Navigation -->
+    <header class="glass-panel sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-gray-800">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="showDashboard()">
+            <span class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">TAX BY MR ASAD</span>
+            <span class="text-xs bg-blue-900/60 text-blue-300 px-2.5 py-1 rounded-full border border-blue-700/50">Debonair Boy</span>
+        </div>
+        <button onclick="showDashboard()" class="text-sm font-medium bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl transition shadow-lg shadow-blue-600/30">Dashboard</button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8 flex-grow max-w-7xl">
+        
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Professional Utility & Tax Hub</h1>
+                <p class="text-gray-400 max-w-2xl mx-auto">Select a specialized module below to launch the interactive workspace powered by advanced tools and study resources.</p>
+            </div>
+
+            <!-- Grid of 20 Options -->
+            <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+
+        <!-- TOOL WORKSPACE VIEW -->
+        <div id="workspace-view" class="hidden">
+            <button onclick="showDashboard()" class="mb-6 flex items-center space-x-2 text-sm text-gray-400 hover:text-white transition">
+                <span>&larr; Back to Dashboard</span>
+            </button>
+            <div class="glass-panel p-8 rounded-2xl shadow-2xl">
+                <h2 id="workspace-title" class="text-3xl font-bold mb-4 text-blue-400"></h2>
+                <div id="workspace-content" class="space-y-6">
+                    <!-- Dynamic Tool Interface -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel py-6 text-center text-xs text-gray-500 border-t border-gray-800 mt-12">
+        &copy; 2026 TAX BY MR ASAD &bull; Designed & Developed by Debonair Boy (Asad ur Rahman Shahid)
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        // 1. Three.js 3D Background Setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Particle Grid Creation
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 700;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.03,
+            color: 0x3b82f6,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        camera.position.z = 5;
+
+        // Mouse movement interaction for 3D background
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX / window.innerWidth - 0.5;
+            mouseY = event.clientY / window.innerHeight - 0.5;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particlesMesh.rotation.y += 0.001 + (mouseX * 0.05);
+            particlesMesh.rotation.x += 0.001 + (mouseY * 0.05);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 2. Define the 20 Options Data
+        const optionsData = [
+            { id: 1, title: "Income Tax Calculator", category: "Taxation", desc: "Automated tax liability computation based on current tax slabs." },
+            { id: 2, title: "Sales Tax Invoicing Tool", category: "Taxation", desc: "Generates compliant tax invoices and output/input adjustments." },
+            { id: 3, title: "Wealth Statement Reconciliation", category: "Taxation", desc: "Multi-part wealth statement equity and inflow/outflow tracker." },
+            { id: 4, title: "ICAP Past Paper Archive", category: "Study", desc: "Searchable repository of past exam questions and marking guidelines." },
+            { id: 5, title: "AI Tax Assistant", category: "Study", desc: "Embedded conversational copilot to answer complex tax queries." },
+            { id: 6, title: "Tax Glossary & Definitions", category: "Study", desc: "Quick-reference legal terminology search engine." },
+            { id: 7, title: "Withholding Tax Matrix", category: "Taxation", desc: "Filterable lookup tool for payment types and withholding rates." },
+            { id: 8, title: "Depreciation Tracker", category: "Taxation", desc: "Computes initial allowance and normal tax depreciation on assets." },
+            { id: 9, title: "Advanced Text Formatter", category: "Developer", desc: "Cleans, formats, converts case, and strips unwanted text characters." },
+            { id: 10, title: "Password & Key Generator", category: "Developer", desc: "Generates high-entropy cryptographic strings with custom rules." },
+            { id: 11, title: "JSON / CSV Transformer", category: "Developer", desc: "Converts tabular data sets into clean JSON arrays or CSV files." },
+            { id: 12, title: "Quick Markdown Editor", category: "Developer", desc: "Live preview text editor for drafting notes and study summaries." },
+            { id: 13, title: "Unit & Currency Converter", category: "Utility", desc: "Fast conversion tool for financial metrics and measurements." },
+            { id: 14, title: "QR Code Generator", category: "Utility", desc: "Instant code generation for text, URLs, or contact data." },
+            { id: 15, title: "Pomodoro Study Timer", category: "Utility", desc: "Integrated productivity countdown timer with focus intervals." },
+            { id: 16, title: "Snippet Vault", category: "Developer", desc: "Local storage repository for code blocks and text snippets." },
+            { id: 17, title: "File Hash Checker", category: "Utility", desc: "Computes file checksums directly in browser for data integrity." },
+            { id: 18, title: "Color Palette Generator", category: "Utility", desc: "Generates harmonious UI color schemes with one-click copying." },
+            { id: 19, title: "About the Author", category: "Profile", desc: "Asad ur Rahman Shahid (Debonair Boy) & CA Journey." },
+            { id: 20, title: "Contact & Social Hub", category: "Profile", desc: "Direct phone number and Instagram connection portals." }
+        ];
+
+        // 3. Render Dashboard Cards
+        const gridContainer = document.getElementById('cards-grid');
+        optionsData.forEach(opt => {
+            const card = document.createElement('div');
+            card.className = `glass-panel p-6 rounded-2xl card-hover cursor-pointer flex flex-col justify-between`;
+            card.onclick = () => openWorkspace(opt);
+            card.innerHTML = `
+                <div>
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-900/40 text-blue-400 border border-blue-800/40">${opt.category}</span>
+                    <h3 class="text-xl font-bold mt-4 mb-2 text-white">${opt.id}. ${opt.title}</h3>
+                    <p class="text-gray-400 text-sm">${opt.desc}</p>
+                </div>
+                <div class="mt-6 flex items-center text-sm text-blue-400 font-medium">
+                    <span>Launch Module &rarr;</span>
+                </div>
+            `;
+            gridContainer.appendChild(card);
+        });
+
+        // 4. Navigation and Workspace Switching Logic
+        function showDashboard() {
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('workspace-view').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openWorkspace(opt) {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('workspace-view').classList.remove('hidden');
+            document.getElementById('workspace-title').innerText = `${opt.id}. ${opt.title}`;
+            
+            const contentContainer = document.getElementById('workspace-content');
+            
+            // Custom UI for Profile Options (19 & 20)
+            if(opt.id === 19) {
+                contentContainer.innerHTML = `
+                    <div class="space-y-4 text-gray-300">
+                        <p class="text-lg font-medium text-white">Hello! I am Asad ur Rahman Shahid, widely known in my development circles as <span class="text-blue-400 font-bold">Debonair Boy</span>.</p>
+                        <p>I am an aspiring Chartered Accountant specializing in the tax laws of Pakistan under the rigorous ICAP CAF-2 syllabus. Alongside my financial expertise, I build high-performance web applications and digital study tools to simplify complex calculations and data management.</p>
+                    </div>
+                `;
+            } else if(opt.id === 20) {
+                contentContainer.innerHTML = `
+                    <div class="space-y-6 text-gray-300">
+                        <p>Get in touch for collaboration, project inquiries, or study discussions:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="glass-panel p-4 rounded-xl border border-gray-700">
+                                <span class="text-xs text-gray-400 block mb-1">Contact Number</span>
+                                <span class="text-lg font-bold text-white">+92 [Your Phone Number]</span>
+                            </div>
+                            <div class="glass-panel p-4 rounded-xl border border-gray-700">
+                                <span class="text-xs text-gray-400 block mb-1">Instagram ID</span>
+                                <span class="text-lg font-bold text-blue-400">@YourInstagramID</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Default interactive placeholder workspace for tools 1-18
+                contentContainer.innerHTML = `
+                    <p class="text-gray-400">Workspace interface for <strong class="text-white">${opt.title}</strong> is active and ready.</p>
+                    <div class="p-6 bg-gray-900/60 rounded-xl border border-gray-800 space-y-4">
+                        <label class="block text-sm font-medium text-gray-300">Input Parameters / Data Source</label>
+                        <input type="text" placeholder="Enter query or values here..." class="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500">
+                        <button onclick="alert('Module operation executed successfully!')" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2 rounded-lg transition">Process Request</button>
+                    </div>
+                `;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
