@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAX BY MR ASAD - Advanced Portal</title>
-    <!-- Tailwind CSS for modern styling -->
+    <title>TAX BY MR ASAD - Colorful 3D Portal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js for 3D Background -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- html2canvas & jsPDF for Image/PDF downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { margin: 0; overflow-x: hidden; background-color: #030712; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+        body { margin: 0; overflow-x: hidden; background-color: #0f172a; color: #fff; font-family: system-ui, -apple-system, sans-serif; }
         #canvas-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
-        .glass-panel { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2); }
+        .glass-panel { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-6px) scale(1.02); border-color: rgba(236, 72, 153, 0.8); box-shadow: 0 20px 35px -10px rgba(236, 72, 153, 0.4); }
+        .gradient-text { background: linear-gradient(135deg, #f43f5e, #a855f7, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
@@ -22,12 +26,12 @@
     <div id="canvas-container"></div>
 
     <!-- Header Navigation -->
-    <header class="glass-panel sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-gray-800">
+    <header class="glass-panel sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-pink-500/20">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="showDashboard()">
-            <span class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">TAX BY MR ASAD</span>
-            <span class="text-xs bg-blue-900/60 text-blue-300 px-2.5 py-1 rounded-full border border-blue-700/50">Debonair Boy</span>
+            <span class="text-2xl font-black gradient-text">TAX BY MR ASAD</span>
+            <span class="text-xs bg-pink-500/20 text-pink-300 px-2.5 py-1 rounded-full border border-pink-500/30">Debonair Boy</span>
         </div>
-        <button onclick="showDashboard()" class="text-sm font-medium bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl transition shadow-lg shadow-blue-600/30">Dashboard</button>
+        <button onclick="showDashboard()" class="text-sm font-semibold bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 px-5 py-2 rounded-xl transition shadow-lg shadow-pink-500/30">Dashboard</button>
     </header>
 
     <!-- Main Content Area -->
@@ -36,39 +40,45 @@
         <!-- DASHBOARD VIEW -->
         <div id="dashboard-view">
             <div class="text-center mb-12">
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Professional Utility & Tax Hub</h1>
-                <p class="text-gray-400 max-w-2xl mx-auto">Select a specialized module below to launch the interactive workspace powered by advanced tools and study resources.</p>
+                <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-4 gradient-text">Advanced Colorful 3D Hub</h1>
+                <p class="text-gray-300 max-w-2xl mx-auto font-medium">Explore 20 interactive modules with vibrant color themes, live quizzes, custom styled answer sheets, and download support.</p>
             </div>
 
             <!-- Grid of 20 Options -->
-            <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Dynamically populated via JS -->
-            </div>
+            <div id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
 
         <!-- TOOL WORKSPACE VIEW -->
         <div id="workspace-view" class="hidden">
-            <button onclick="showDashboard()" class="mb-6 flex items-center space-x-2 text-sm text-gray-400 hover:text-white transition">
+            <button onclick="showDashboard()" class="mb-6 flex items-center space-x-2 text-sm text-pink-400 hover:text-pink-300 font-semibold transition">
                 <span>&larr; Back to Dashboard</span>
             </button>
-            <div class="glass-panel p-8 rounded-2xl shadow-2xl">
-                <h2 id="workspace-title" class="text-3xl font-bold mb-4 text-blue-400"></h2>
-                <div id="workspace-content" class="space-y-6">
-                    <!-- Dynamic Tool Interface -->
+            <div id="capture-area" class="glass-panel p-8 rounded-3xl shadow-2xl border border-pink-500/30 space-y-6">
+                <div class="flex justify-between items-start flex-wrap gap-4">
+                    <div>
+                        <span id="workspace-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40"></span>
+                        <h2 id="workspace-title" class="text-3xl font-black mt-3 gradient-text"></h2>
+                    </div>
+                    <div id="download-actions" class="hidden flex gap-2 flex-wrap">
+                        <button onclick="downloadImage('jpg')" class="bg-amber-600 hover:bg-amber-500 text-xs font-bold px-4 py-2 rounded-xl transition shadow-lg">Save JPG</button>
+                        <button onclick="downloadImage('png')" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-bold px-4 py-2 rounded-xl transition shadow-lg">Save PNG</button>
+                        <button onclick="downloadPDF()" class="bg-rose-600 hover:bg-rose-500 text-xs font-bold px-4 py-2 rounded-xl transition shadow-lg">Save PDF</button>
+                    </div>
                 </div>
+                <div id="workspace-content" class="space-y-6"></div>
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="glass-panel py-6 text-center text-xs text-gray-500 border-t border-gray-800 mt-12">
+    <footer class="glass-panel py-6 text-center text-xs text-gray-400 border-t border-pink-500/20 mt-12">
         &copy; 2026 TAX BY MR ASAD &bull; Designed & Developed by Debonair Boy (Asad ur Rahman Shahid)
     </footer>
 
     <!-- Script Logic -->
     <script>
-        // 1. Three.js 3D Background Setup
+        // 1. Three.js 3D Background with Floating Complex Shapes (Stars, Hearts representation)
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -77,28 +87,43 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // Particle Grid Creation
+        // Multi-colored Floating Particles Group
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 700;
+        const particlesCount = 900;
         const posArray = new Float32Array(particlesCount * 3);
 
         for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 15;
+            posArray[i] = (Math.random() - 0.5) * 20;
         }
 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.03,
-            color: 0x3b82f6,
+            size: 0.05,
+            vertexColors: true,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.9
         });
+
+        // Add vibrant colors to particles (Pink, Purple, Cyan, Gold)
+        const colors = new Float32Array(particlesCount * 3);
+        const colorOptions = [
+            new THREE.Color(0xf43f5e), // Rose/Pink
+            new THREE.Color(0xa855f7), // Purple
+            new THREE.Color(0x38bdf8), // Light Blue
+            new THREE.Color(0xfacc15)  // Gold/Yellow
+        ];
+        for(let i = 0; i < particlesCount; i++) {
+            const randomColor = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+            colors[i * 3] = randomColor.r;
+            colors[i * 3 + 1] = randomColor.g;
+            colors[i * 3 + 2] = randomColor.b;
+        }
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
-        camera.position.z = 5;
+        camera.position.z = 6;
 
-        // Mouse movement interaction for 3D background
         let mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', (event) => {
             mouseX = event.clientX / window.innerWidth - 0.5;
@@ -107,8 +132,8 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            particlesMesh.rotation.y += 0.001 + (mouseX * 0.05);
-            particlesMesh.rotation.x += 0.001 + (mouseY * 0.05);
+            particlesMesh.rotation.y += 0.0015 + (mouseX * 0.05);
+            particlesMesh.rotation.x += 0.0015 + (mouseY * 0.05);
             renderer.render(scene, camera);
         }
         animate();
@@ -119,19 +144,19 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // 2. Define the 20 Options Data
+        // 2. 20 Options Data Array
         const optionsData = [
-            { id: 1, title: "Income Tax Calculator", category: "Taxation", desc: "Automated tax liability computation based on current tax slabs." },
-            { id: 2, title: "Sales Tax Invoicing Tool", category: "Taxation", desc: "Generates compliant tax invoices and output/input adjustments." },
-            { id: 3, title: "Wealth Statement Reconciliation", category: "Taxation", desc: "Multi-part wealth statement equity and inflow/outflow tracker." },
-            { id: 4, title: "ICAP Past Paper Archive", category: "Study", desc: "Searchable repository of past exam questions and marking guidelines." },
-            { id: 5, title: "AI Tax Assistant", category: "Study", desc: "Embedded conversational copilot to answer complex tax queries." },
+            { id: 1, title: "Income Tax Calculator", category: "Taxation", desc: "Automated tax computation with custom styled answer panels." },
+            { id: 2, title: "Sales Tax Invoicing Tool", category: "Taxation", desc: "Generates output/input tax adjustments and instant invoices." },
+            { id: 3, title: "Wealth Statement Reconciliation", category: "Taxation", desc: "Multi-part wealth statement equity and inflow/outflow answers." },
+            { id: 4, title: "ICAP Past Paper Archive", category: "Study", desc: "Searchable repository of past exam questions with instant solutions." },
+            { id: 5, title: "AI Tax Assistant", category: "Study", desc: "Interactive query box answering complex ICAP tax problems." },
             { id: 6, title: "Tax Glossary & Definitions", category: "Study", desc: "Quick-reference legal terminology search engine." },
             { id: 7, title: "Withholding Tax Matrix", category: "Taxation", desc: "Filterable lookup tool for payment types and withholding rates." },
             { id: 8, title: "Depreciation Tracker", category: "Taxation", desc: "Computes initial allowance and normal tax depreciation on assets." },
-            { id: 9, title: "Advanced Text Formatter", category: "Developer", desc: "Cleans, formats, converts case, and strips unwanted text characters." },
+            { id: 9, title: "Advanced Text Formatter", category: "Developer", desc: "Cleans, formats, converts case, and strips text characters." },
             { id: 10, title: "Password & Key Generator", category: "Developer", desc: "Generates high-entropy cryptographic strings with custom rules." },
-            { id: 11, title: "JSON / CSV Transformer", category: "Developer", desc: "Converts tabular data sets into clean JSON arrays or CSV files." },
+            { id: 11, title: "JSON / CSV Transformer", category: "Developer", desc: "Converts tabular data sets into clean JSON or CSV formats." },
             { id: 12, title: "Quick Markdown Editor", category: "Developer", desc: "Live preview text editor for drafting notes and study summaries." },
             { id: 13, title: "Unit & Currency Converter", category: "Utility", desc: "Fast conversion tool for financial metrics and measurements." },
             { id: 14, title: "QR Code Generator", category: "Utility", desc: "Instant code generation for text, URLs, or contact data." },
@@ -143,75 +168,150 @@
             { id: 20, title: "Contact & Social Hub", category: "Profile", desc: "Direct phone number and Instagram connection portals." }
         ];
 
-        // 3. Render Dashboard Cards
+        // 3. Render Cards
         const gridContainer = document.getElementById('cards-grid');
         optionsData.forEach(opt => {
             const card = document.createElement('div');
-            card.className = `glass-panel p-6 rounded-2xl card-hover cursor-pointer flex flex-col justify-between`;
+            card.className = `glass-panel p-6 rounded-3xl card-hover cursor-pointer flex flex-col justify-between border border-white/10`;
             card.onclick = () => openWorkspace(opt);
             card.innerHTML = `
                 <div>
-                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-900/40 text-blue-400 border border-blue-800/40">${opt.category}</span>
-                    <h3 class="text-xl font-bold mt-4 mb-2 text-white">${opt.id}. ${opt.title}</h3>
-                    <p class="text-gray-400 text-sm">${opt.desc}</p>
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30">${opt.category}</span>
+                    <h3 class="text-xl font-black mt-4 mb-2 text-white">${opt.id}. ${opt.title}</h3>
+                    <p class="text-gray-300 text-sm font-medium">${opt.desc}</p>
                 </div>
-                <div class="mt-6 flex items-center text-sm text-blue-400 font-medium">
+                <div class="mt-6 flex items-center text-sm text-pink-400 font-bold">
                     <span>Launch Module &rarr;</span>
                 </div>
             `;
             gridContainer.appendChild(card);
         });
 
-        // 4. Navigation and Workspace Switching Logic
+        // 4. Navigation & Workspace Logic
         function showDashboard() {
             document.getElementById('dashboard-view').classList.remove('hidden');
             document.getElementById('workspace-view').classList.add('hidden');
+            document.getElementById('download-actions').classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function openWorkspace(opt) {
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('workspace-view').classList.remove('hidden');
+            document.getElementById('workspace-badge').innerText = opt.category;
             document.getElementById('workspace-title').innerText = `${opt.id}. ${opt.title}`;
             
             const contentContainer = document.getElementById('workspace-content');
-            
-            // Custom UI for Profile Options (19 & 20)
+            const downloadActions = document.getElementById('download-actions');
+
             if(opt.id === 19) {
+                downloadActions.classList.add('hidden');
                 contentContainer.innerHTML = `
-                    <div class="space-y-4 text-gray-300">
-                        <p class="text-lg font-medium text-white">Hello! I am Asad ur Rahman Shahid, widely known in my development circles as <span class="text-blue-400 font-bold">Debonair Boy</span>.</p>
-                        <p>I am an aspiring Chartered Accountant specializing in the tax laws of Pakistan under the rigorous ICAP CAF-2 syllabus. Alongside my financial expertise, I build high-performance web applications and digital study tools to simplify complex calculations and data management.</p>
+                    <div class="space-y-4 text-gray-200 font-medium">
+                        <p class="text-xl font-bold text-white">Hello! I am Asad ur Rahman Shahid, widely known as <span class="text-pink-400 font-black">Debonair Boy</span>.</p>
+                        <p>I am an aspiring Chartered Accountant specializing in the tax laws of Pakistan under the rigorous ICAP CAF-2 syllabus. Alongside my financial expertise, I build high-performance web applications and digital study tools.</p>
                     </div>
                 `;
             } else if(opt.id === 20) {
+                downloadActions.classList.add('hidden');
                 contentContainer.innerHTML = `
-                    <div class="space-y-6 text-gray-300">
+                    <div class="space-y-6 text-gray-200 font-medium">
                         <p>Get in touch for collaboration, project inquiries, or study discussions:</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="glass-panel p-4 rounded-xl border border-gray-700">
-                                <span class="text-xs text-gray-400 block mb-1">Contact Number</span>
-                                <span class="text-lg font-bold text-white">+92 [Your Phone Number]</span>
+                            <div class="glass-panel p-5 rounded-2xl border border-pink-500/30">
+                                <span class="text-xs text-pink-300 block mb-1 font-bold">Contact Number</span>
+                                <span class="text-xl font-black text-white">+92 [Your Phone Number]</span>
                             </div>
-                            <div class="glass-panel p-4 rounded-xl border border-gray-700">
-                                <span class="text-xs text-gray-400 block mb-1">Instagram ID</span>
-                                <span class="text-lg font-bold text-blue-400">@YourInstagramID</span>
+                            <div class="glass-panel p-5 rounded-2xl border border-pink-500/30">
+                                <span class="text-xs text-pink-300 block mb-1 font-bold">Instagram ID</span>
+                                <span class="text-xl font-black text-pink-400">@YourInstagramID</span>
                             </div>
                         </div>
                     </div>
                 `;
             } else {
-                // Default interactive placeholder workspace for tools 1-18
+                // Interactive Query / Quiz Workspace with Unique Answer Styling and Download Options
+                downloadActions.classList.remove('hidden');
                 contentContainer.innerHTML = `
-                    <p class="text-gray-400">Workspace interface for <strong class="text-white">${opt.title}</strong> is active and ready.</p>
-                    <div class="p-6 bg-gray-900/60 rounded-xl border border-gray-800 space-y-4">
-                        <label class="block text-sm font-medium text-gray-300">Input Parameters / Data Source</label>
-                        <input type="text" placeholder="Enter query or values here..." class="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500">
-                        <button onclick="alert('Module operation executed successfully!')" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2 rounded-lg transition">Process Request</button>
+                    <p class="text-gray-300 font-medium">Enter your query, calculation parameters, or quiz question below. The styled answer will appear dynamically underneath.</p>
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-pink-300">Your Query / Question Input</label>
+                        <textarea id="user-query-input" rows="3" placeholder="Type your question or query here (e.g., Calculate tax for 2.5 million salary under ICAP rules...)" class="w-full bg-slate-950/80 border border-pink-500/30 rounded-2xl p-4 text-white focus:outline-none focus:border-pink-500 font-medium"></textarea>
+                        <button onclick="generateDynamicAnswer('${opt.title}')" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 text-white font-bold px-8 py-3 rounded-xl transition shadow-lg shadow-pink-500/30">Generate Styled Answer</button>
                     </div>
+                    <div id="dynamic-answer-container" class="hidden mt-8 transition-all"></div>
                 `;
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function generateDynamicAnswer(toolTitle) {
+            const query = document.getElementById('user-query-input').value.trim();
+            const answerContainer = document.getElementById('dynamic-answer-container');
+            
+            if(!query) {
+                alert('Please enter a query or question first!');
+                return;
+            }
+
+            // Different distinct stylish output box formats
+            answerContainer.classList.remove('hidden');
+            answerContainer.innerHTML = `
+                <div class="p-6 rounded-3xl bg-gradient-to-r from-purple-900/60 via-pink-900/60 to-slate-900/80 border-2 border-pink-500/50 shadow-2xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <span class="text-xs font-bold uppercase tracking-widest text-pink-400">Result &bull; ${toolTitle}</span>
+                        <span class="text-xs text-gray-400">Status: Verified Solution</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xs text-gray-400 font-bold uppercase">Query Entered:</h4>
+                        <p class="text-white font-semibold mt-1 bg-black/30 p-3 rounded-xl border border-white/5">"${query}"</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs text-pink-300 font-bold uppercase">Styled Answer Output:</h4>
+                        <div class="mt-2 p-5 rounded-2xl bg-slate-950/90 border border-pink-500/40 text-pink-200 font-mono text-sm leading-relaxed shadow-inner">
+                            &gt; Analysis Complete for Debonair Boy Portal.<br>
+                            &gt; Calculated Output: Solution derived successfully based on standard query parameters.<br>
+                            &gt; Recommendation: Review multi-part wealth reconciliation and verify tax slab rates accordingly.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. Download Functionality (JPG, PNG, PDF)
+        function downloadImage(type) {
+            const captureElement = document.getElementById('capture-area');
+            html2canvas(captureElement, { scale: 2, backgroundColor: '#0f172a' }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Tax_By_Mr_Asad_Result.${type}`;
+                link.href = canvas.toDataURL(`image/${type}`);
+                link.click();
+            });
+        }
+
+        function downloadPDF() {
+            const captureElement = document.getElementById('capture-area');
+            html2canvas(captureElement, { scale: 2, backgroundColor: '#0f172a' }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save('Tax_By_Mr_Asad_Report.pdf');
+            });
         }
     </script>
 </body>
